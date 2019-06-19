@@ -1,0 +1,10 @@
+[package]
+name = "chaosmarmoset"
+version = "0.1.0"
+authors = ["Robert Tarrall <robert@tarrall.org>"]
+
+[dependencies]
+libc = "0.2"
+rand = "0.6"
+reqwest = "0.9"
+structopt = "0.2.14"
