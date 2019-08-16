@@ -27,7 +27,7 @@ struct Opt {
     #[structopt(short = "d", long = "debug")]
     debug: bool,
 
-    /// mode: CPU, Disk, Network Sink, Web Client, or Memory
+    /// mode: CPU, Disk, Network Sink, Web Client, Memory, or Logspam
     #[structopt(raw(required = "true"), short = "m", long = "mode")]
     mode: String,
 
@@ -43,7 +43,7 @@ struct Opt {
     #[structopt(short = "U", long = "url")]
     url: Option<String>,
 
-    /// Sleep between fetches in milliseconds for web client
+    /// Sleep in milliseconds(between fetches for web client; between logs for logspammer)
     #[structopt(short = "s", long = "sleep")]
     sleep: Option<u64>,
 }
@@ -93,6 +93,15 @@ fn main() {
             None    => panic!("Specify a URL, e.g. --url http://www.didyoutryturningitoffandon.com/"),
         }
         process::exit(0);
+    } else if mode == "log-spam" {
+        // Spam stdout.  Did you know that EKS didn't used to rotate logfiles by default?
+        // No?  Neither did I!!!
+        let sleepms;
+        match opt.sleep {
+            Some(ms) => sleepms = Duration::from_millis(ms),
+            None     => sleepms = Duration::from_millis(0),
+        }
+        spam_stdout(sleepms);
     } else {
         // TODO: fill up the disk
         // TODO: thrash the disk (lots of reads, or writes)
@@ -192,6 +201,13 @@ fn web_client(url: String, sleepms: Duration) -> Result<(), Box<std::error::Erro
         let count = count_newlines(&body);
         println!("{:#?}", count);
         println!("{:#?}", body);
+        sleep(sleepms);
+    }
+}
+
+fn spam_stdout(sleepms: Duration) {
+    loop {
+        println!("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dolor sed viverra ipsum nunc aliquet bibendum enim. In massa tempor nec feugiat. Nunc aliquet bibendum enim facilisis gravida. Nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper. Amet luctus venenatis lectus magna fringilla. Volutpat maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Sagittis orci a scelerisque purus semper eget duis. Nulla pharetra diam sit amet nisl suscipit. Sed adipiscing diam donec adipiscing tristique risus nec feugiat in. Fusce ut placerat orci nulla. Pharetra vel turpis nunc eget lorem dolor. Tristique senectus et netus et malesuada.");
         sleep(sleepms);
     }
 }
